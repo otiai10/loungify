@@ -23,9 +23,12 @@ func (c WebSocket)Socket(ws *websocket.Conn) revel.Result {
             err := websocket.Message.Receive(ws, &message)
             // 何かしらエラーが起きたら
             if err != nil {
-                fmt.Printf("err?%+v\n", err)
-                // チャネルを閉じる
+                // err === "EOF"
+                // fmt.Printf("err?%T\n", err)
+                // fmt.Println("チャネルを閉じる")
                 close(simpleChan)
+                // fmt.Println("ルーチンを終わる")
+                return
             }
             // エラーが無ければ、チャネルを通す
             simpleChan <- message
