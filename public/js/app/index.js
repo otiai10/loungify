@@ -8,6 +8,9 @@ Lounge.socket = function(opt){
 };
 $(function(){
     Lounge.socket().onopen = function(e){
-        Lounge.socket().send("{}");
+        Lounge.socket().send("Hello, server!");
+    };
+    Lounge.socket().onmessage = function(e){
+        console.log("return from server,", e);
     };
 });
