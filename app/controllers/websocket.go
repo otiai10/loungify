@@ -3,8 +3,6 @@ package controllers
 import (
     "code.google.com/p/go.net/websocket"
     "github.com/robfig/revel"
-
-    "fmt"
 )
 
 type WebSocket struct {
@@ -39,16 +37,15 @@ func (c WebSocket)Socket(ws *websocket.Conn) revel.Result {
     for {
         // チャネルからstringが来るのをまっている
         // ここで同期処理は一時待機になる
-        fmt.Println("Waiting for channel...")
-        message, stillOpen := <-simpleChan
-        // チャネルから送信されてきたら再開するはず
-        fmt.Println("Received from channel!")
-        if !stillOpen {
-            // チャネルが閉じているので、これ以上なにもしない
-            return nil
+        select {
+        case message, ok := <-simpleChan:
+            if !ok {
+                // チャネルが閉じているので、これ以上なにもしない
+                return nil
+            }
+            // stillOpenなので、ウェブソケットで送る
+            websocket.JSON.Send(ws, &map[string]string{"received":message})
         }
-        // stillOpenなので、ウェブソケットで送る
-        websocket.JSON.Send(ws, &map[string]string{"received":message})
     }
 
     return nil
